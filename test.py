@@ -8,6 +8,15 @@ def fci_energy(mol, nroots=1):
     e, fcivec = fci.solve_fci(mf, nroots=nroots)
     return e
 
+def write_xyz(mol, fname="out.xyz"):
+    txt = ""
+    txt += str(len(mol.atom))+"\n"
+    txt += "\n"
+    for at in mol.atom:
+        txt += f"{at[0]} {at[1]} {at[2]} {at[3]}\n"
+    wf = open(fname, "w")
+    wf.write(txt)
+    return
 
 def test_casscf():
     # molecular structure
@@ -30,6 +39,7 @@ def test_casscf():
     assert(abs(e_fci - e) < 1e-6)
 
     casscf.opt_ci(mol)
+    write_xyz(casscf.mol_opt)
     return
         
     
