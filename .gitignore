@@ -1,0 +1,10 @@
+__pycache__
+.DS*
+*aux
+*log
+*synctex*
+*fls
+*fdb*
+.github_sample
+.pytest_cache
+*egg-info
