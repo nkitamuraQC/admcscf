@@ -1,5 +1,5 @@
 # admcscf
-Admcscf is a Python package for the multi-configurational self-consistent field calculations(MCSCF) with Automatic differentiation (AD).
+admcscf is a Python package for the multi-configurational self-consistent field calculations(MCSCF) with Automatic differentiation (AD).
 
 ## Features
 - MCSCF calculations with AD
