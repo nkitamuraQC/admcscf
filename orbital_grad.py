@@ -34,6 +34,7 @@ class CASSCF_Energy:
         self.ncas = ncas
         self.nelecas = nelecas
         self.ncore = self.mf.mol.nelectron // 2 - nelecas // 2
+        self.e_cas = None
 
     def expmat(self, r0, nterms=10):
         exp_r = jnp.identity(r0.shape[0])
@@ -54,9 +55,10 @@ class CASSCF_Energy:
 
     def casscf_energy3(self, nroots=1):
         h1eff, h2eff, energy_core = self.get_cas()
-        e, ci = kernel(h1eff, h2eff, self.norb, self.nelec, nroots=nroots)
+        e, self.ci = kernel(h1eff, h2eff, self.ncas, self.nelecas, nroots=nroots)
         if nroots == 1:
             self.e_tot = e + energy_core
+            self.e_cas = e
             return e + energy_core
         if nroots == 2:
             return e[1] - e[0]
@@ -89,6 +91,7 @@ class CASSCF:
         self.nelecas = nelecas
         self.elems = elems
         self.basis = "sto-3g"
+        self.e_cas = None
         
     def run_HF(self):
         self.mf = scf.RHF(self.mol)
@@ -98,6 +101,7 @@ class CASSCF:
     def energy(self, x0, mf):
         myci = CASSCF_Energy(mf, x=jnp.asarray(x0), ncas=self.ncas, nelecas=self.nelecas)
         e = myci.casscf_energy3()
+        self.e_cas = myci.e_cas
         return myci.e_tot
     
     def optimize_mo_fun(self, x0):

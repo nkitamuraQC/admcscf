@@ -1,1 +1,4 @@
 pyscfad==0.1.6
+numpy<2
+scipy
+pyscf==2.3

@@ -3,8 +3,10 @@ Admcscf is a Python package for the multi-configurational self-consistent field 
 
 ## Features
 - MCSCF calculations with AD
-  - CASSCF method
-  - Determination of a structure of conical intersection
+  - CASSCF method (Full space only)
+- Future
+  - CASSCF method (Reduced space)
+  - model Hamiltonian
 
 ## Usages
 See test
