@@ -1,5 +1,5 @@
 from pyscfad import gto, scf, fci, ao2mo
-from orbital_grad import CASSCF
+from ad.orbital_grad import CASSCF
 import pytest
 from jax import numpy as jnp
 import numpy as np
