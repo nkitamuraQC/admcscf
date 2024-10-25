@@ -30,6 +30,7 @@ def test_casscf():
     casscf.run_HF()
     e = casscf.opt_mo()
     assert(abs(e_fci - e) < 1e-6)
+    assert(abs(-1.056740746305258 - e) < 1e-6)
     return
 
 #def test_casscf2():
