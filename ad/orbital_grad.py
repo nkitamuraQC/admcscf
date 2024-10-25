@@ -64,7 +64,7 @@ class CASSCF_Energy:
             return e[1] - e[0]
 
     def get_cas(self):
-        mo_coeff = self.mf.mo_coeff
+        mo_coeff = self.mo
         ncas = self.ncas
         ncore = self.ncore
         mo_core = mo_coeff[:,:ncore]
