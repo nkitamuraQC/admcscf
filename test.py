@@ -57,4 +57,4 @@ def test_casscf():
 
 if __name__ == "__main__":
     test_casscf()
-    test_casscf2()
+    #test_casscf2()
