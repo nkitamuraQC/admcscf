@@ -30,7 +30,7 @@ class CASSCF_Energy:
         self.int1e = jnp.einsum("ia,jb,ij->ab", self.mo, self.mo, hcore)
         self.int2e = ao2mo.incore.full(mf._eri, self.mo)
         self.r0 = jnp.zeros((norb, norb))
-        
+
         self.ncas = ncas
         self.nelecas = nelecas
         self.ncore = self.mf.mol.nelectron // 2 - nelecas // 2
@@ -67,8 +67,8 @@ class CASSCF_Energy:
         mo_coeff = self.mf.mo_coeff
         ncas = self.ncas
         ncore = self.ncore
-        mo_core = mo_coeff[:,:ncore]
-        mo_cas = mo_coeff[:,ncore:ncore+ncas]
+        mo_core = mo_coeff[:, :ncore]
+        mo_cas = mo_coeff[:, ncore : ncore + ncas]
 
         hcore = self.mf.get_hcore()
         energy_core = self.mf.mol.energy_nuc()
@@ -77,12 +77,17 @@ class CASSCF_Energy:
         else:
             core_dm = jnp.dot(mo_core, mo_core.conj().T) * 2
             corevhf = self.mf.get_veff(self.mol, core_dm)
-            energy_core += jnp.einsum('ij,ji', core_dm, hcore).real
-            energy_core += jnp.einsum('ij,ji', core_dm, corevhf).real * .5
-        h1eff = reduce(jnp.dot, (mo_cas.conj().T, hcore+corevhf, mo_cas))
-        h2eff = self.int2e[ncore:ncore+ncas, ncore:ncore+ncas, ncore:ncore+ncas, ncore:ncore+ncas]
+            energy_core += jnp.einsum("ij,ji", core_dm, hcore).real
+            energy_core += jnp.einsum("ij,ji", core_dm, corevhf).real * 0.5
+        h1eff = reduce(jnp.dot, (mo_cas.conj().T, hcore + corevhf, mo_cas))
+        h2eff = self.int2e[
+            ncore : ncore + ncas,
+            ncore : ncore + ncas,
+            ncore : ncore + ncas,
+            ncore : ncore + ncas,
+        ]
         return h1eff, h2eff, energy_core
-    
+
 
 class CASSCF:
     def __init__(self, mol, ncas, nelecas, elems=None):
@@ -92,29 +97,32 @@ class CASSCF:
         self.elems = elems
         self.basis = "sto-3g"
         self.e_cas = None
-        
+
     def run_HF(self):
         self.mf = scf.RHF(self.mol)
         self.mf.kernel()
         return
 
     def energy(self, x0, mf):
-        myci = CASSCF_Energy(mf, x=jnp.asarray(x0), ncas=self.ncas, nelecas=self.nelecas)
+        myci = CASSCF_Energy(
+            mf, x=jnp.asarray(x0), ncas=self.ncas, nelecas=self.nelecas
+        )
         e = myci.casscf_energy3()
         self.e_cas = myci.e_cas
         return myci.e_tot
-    
+
     def optimize_mo_fun(self, x0):
         f, g = value_and_grad(self.energy)(x0, self.mf)
         return (jnp.array(f), jnp.array(g))
-    
+
     def opt_mo(self):
         nao = self.mf.mol.nao
         size = nao * (nao - 1) // 2
         x0 = jnp.zeros((size,))
         options = {"gtol": 1e-6}
-        res = minimize(self.optimize_mo_fun, x0, jac=True, method="BFGS", options=options)
+        res = minimize(
+            self.optimize_mo_fun, x0, jac=True, method="BFGS", options=options
+        )
         e = self.optimize_mo_fun(res.x)[0]
-        self.x = res.x 
+        self.x = res.x
         return e
-

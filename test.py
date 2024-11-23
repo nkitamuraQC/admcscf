@@ -6,34 +6,36 @@ import numpy as np
 from pyscf.mcscf import CASSCF as plainCASSCF
 from pyscf import gto as plaingto
 
+
 def fci_energy(mol, nroots=1):
     mf = scf.RHF(mol)
     mf.kernel()
     e, fcivec = fci.solve_fci(mf, nroots=nroots)
     return e
 
+
 def test_casscf():
     # molecular structure
     mol = gto.Mole()
     mol.verbose = 0
-    mol.output = None#"out_h2o"
+    mol.output = None  # "out_h2o"
     mol.atom = [
-        ["H",  (0.000000,  0.000000,  0.000000)],
-        ["H",  (0.000000,  0.000000,  1.200000)],
+        ["H", (0.000000, 0.000000, 0.000000)],
+        ["H", (0.000000, 0.000000, 1.200000)],
     ]
     mol.basis = "sto-3g"
     mol.build()
-
 
     e_fci = fci_energy(mol)
     casscf = CASSCF(mol, 2, 2)
     casscf.run_HF()
     e = casscf.opt_mo()
-    assert(abs(e_fci - e) < 1e-6)
-    assert(abs(-1.056740746305258 - e) < 1e-6)
+    assert abs(e_fci - e) < 1e-6
+    assert abs(-1.056740746305258 - e) < 1e-6
     return
 
-#def test_casscf2():
+
+# def test_casscf2():
 #    # molecular structure
 #    mol = gto.Mole()
 #    mol.verbose = 0
@@ -58,4 +60,4 @@ def test_casscf():
 
 if __name__ == "__main__":
     test_casscf()
-    #test_casscf2()
+    # test_casscf2()
